@@ -1,0 +1,41 @@
+# Root gitignore for InfinityMind Tech project
+
+# Python / Backend
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+backend/.env
+backend/app/migrations/versions/
+
+# Node / Frontend
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+
+# Media Uploads (do not commit uploaded files)
+uploads/*
+!uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
