@@ -99,8 +99,8 @@ export interface ProductModule {
 export interface ProductDetail extends ProductListItem {
   description: string | null;
   hero_video_url: string | null;
-  features: Array<{ title: string; description?: string }>;
-  benefits: Array<{ title: string }>;
+  features: Array<{ title: string; description?: string } | string>;
+  benefits: Array<{ title: string } | string>;
   use_cases: string[];
   modules: ProductModule[];
   gallery: Array<{
@@ -345,3 +345,4 @@ export interface HomePublicResponse {
   about_preview?: AboutPreviewContent | null;
   final_cta?: FinalCTAContent | null;
 }
+

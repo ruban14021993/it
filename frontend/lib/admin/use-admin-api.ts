@@ -1,27 +1,41 @@
+import { useCallback } from "react";
 import { useAuth } from "@/lib/admin/auth-context";
 
 const getApiBase = () => {
-  if (typeof window === "undefined") {
-    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  }
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 };
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
 
 export function useAdminApi() {
   const { token, logout } = useAuth();
 
-  async function adminFetch<T>(
+  const adminFetch = useCallback(async <T>(
     path: string,
     options?: RequestInit
-  ): Promise<T> {
-    if (!token) throw new Error("Not authenticated");
+  ): Promise<T> => {
+    if (!token) throw new ApiError("Not authenticated", 401);
 
     const API_BASE = getApiBase();
-    const res = await fetch(`${API_BASE}/api/v1/admin${path}`, {
+    
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+    };
+    
+    if (!(options?.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(`${API_BASE}/api/v1${path}`, {
       ...options,
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...headers,
         ...(options?.headers || {}),
       },
       cache: "no-store",
@@ -29,17 +43,25 @@ export function useAdminApi() {
 
     if (res.status === 401) {
       logout();
-      throw new Error("Session expired");
+      throw new ApiError("Session expired", 401);
     }
 
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(`API error ${res.status}: ${error}`);
+      const errorText = await res.text();
+      let detail = `API error ${res.status}`;
+      try {
+        const errJson = JSON.parse(errorText);
+        if (errJson.detail) {
+           detail = typeof errJson.detail === 'string' ? errJson.detail : JSON.stringify(errJson.detail);
+        }
+      } catch {}
+      throw new ApiError(detail, res.status);
     }
 
     if (res.status === 204) return undefined as T;
     return res.json() as Promise<T>;
-  }
+  }, [token, logout]);
 
   return { adminFetch };
 }
+

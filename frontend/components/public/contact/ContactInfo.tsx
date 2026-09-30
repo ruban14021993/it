@@ -22,7 +22,7 @@ export default function ContactInfo({ settings, branches }: Props) {
               </div>
               <div>
                 <div className="text-sm font-semibold text-slate-900 mb-1">Email Us</div>
-                <a href={`mailto:${settings.primary_email}`} className="text-lg text-slate-600 hover:text-blue-600 transition-colors">
+                <a href={`mailto:${settings.primary_email}`} className="text-lg text-slate-600 hover:text-blue-600 transition-colors break-all">
                   {settings.primary_email}
                 </a>
               </div>

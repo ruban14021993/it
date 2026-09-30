@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+﻿FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -16,5 +16,5 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Command to run the application (with reload enabled for development)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Command to run the application using dynamically assigned PORT or default to 8000
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

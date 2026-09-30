@@ -446,3 +446,40 @@ class FAQ(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Enquiries
+# ---------------------------------------------------------------------------
+
+class Enquiry(Base):
+    __tablename__ = "enquiries"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    email: Mapped[str] = mapped_column(String(200), nullable=False)
+    phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="new")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Careers / Job Openings
+# ---------------------------------------------------------------------------
+
+class JobOpening(Base):
+    __tablename__ = "job_openings"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    slug: Mapped[str] = mapped_column(String(200), unique=True, nullable=False, index=True)
+    department: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    location: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    requirements: Mapped[list] = mapped_column(JSONB, default=list)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    display_order: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)

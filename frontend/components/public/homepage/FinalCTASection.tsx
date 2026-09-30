@@ -10,7 +10,7 @@ export default function FinalCTASection({ content }: FinalCTASectionProps) {
   if (!content) return null;
 
   return (
-    <section className="relative py-24 lg:py-32 bg-slate-900 overflow-hidden" aria-labelledby="final-cta-heading">
+    <section className="relative py-16 lg:py-20 bg-slate-900 overflow-hidden" aria-labelledby="final-cta-heading">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 opacity-10" aria-hidden="true">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-400 via-transparent to-transparent" />

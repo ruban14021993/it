@@ -12,7 +12,7 @@ export default function ProductCard({ product }: Props) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 h-full"
+      className="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#0a82bd] focus:ring-offset-2 h-full"
     >
       <div className="relative h-48 bg-gradient-to-br from-slate-50 to-slate-100 flex-shrink-0">
         {product.hero_image ? (
@@ -29,14 +29,14 @@ export default function ProductCard({ product }: Props) {
         )}
         
         {product.category && (
-          <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md text-blue-600 shadow-sm border border-slate-100">
+          <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md text-[#0a82bd] shadow-sm border border-slate-100">
             {product.category.name}
           </span>
         )}
       </div>
       
       <div className="p-6 flex flex-col flex-1">
-        <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-[#0a82bd] transition-colors">
           {product.name}
         </h3>
         
@@ -46,7 +46,7 @@ export default function ProductCard({ product }: Props) {
           </p>
         )}
         
-        <div className="mt-auto flex items-center text-sm font-semibold text-blue-600 group-hover:text-blue-700">
+        <div className="mt-auto flex items-center text-sm font-semibold text-[#0a82bd] group-hover:text-[#086a9a]">
           Learn More 
           <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
         </div>

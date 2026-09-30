@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useAuth } from "@/lib/admin/auth-context";
 
 export default function LoginPage() {
@@ -27,8 +28,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            InfinityMind Tech
+          <div className="flex justify-center mb-6">
+            <Image src="/images/logo.jpg" alt="InfinityMind Tech" width={240} height={64} className="h-16 w-auto object-contain" priority />
+          </div>
+          <h2 className="text-center text-xl font-bold text-gray-900">
+            Admin Portal
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Admin Dashboard Login

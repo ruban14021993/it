@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { HeroSection as HeroSectionType } from "@/lib/types";
+import { mediaUrl } from "@/lib/utils";
 
 interface HeroSectionProps {
   hero: HeroSectionType;
@@ -15,7 +17,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           {/* Left Column: Content */}
           <div className="flex flex-col items-start max-w-2xl">
             {hero.eyebrow && (
-              <span className="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold tracking-wide uppercase mb-6 shadow-sm border border-blue-200">
+              <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-[#0a82bd] text-sm font-semibold tracking-wide uppercase mb-6 shadow-sm border border-blue-100">
                 {hero.eyebrow}
               </span>
             )}
@@ -34,7 +36,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               {hero.primary_cta_text && (
                 <Link
                   href={hero.primary_cta_url || "/products"}
-                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-lg shadow-blue-600/20 group"
+                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-[#0a82bd] to-[#00a56f] rounded-lg hover:from-[#086a9a] hover:to-[#008257] transition-all focus:outline-none focus:ring-2 focus:ring-[#0a82bd] focus:ring-offset-2 shadow-lg shadow-blue-500/30 group"
                 >
                   {hero.primary_cta_text}
                   <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -51,33 +53,59 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             </div>
           </div>
 
-          {/* Right Column: Abstract Technology Visual */}
-          <div className="relative hidden lg:block h-[500px] w-full">
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* Abstract decorative elements */}
-              <div className="relative w-full h-full max-w-md mx-auto">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute top-1/4 right-1/4 w-48 h-48 bg-emerald-400/20 rounded-full blur-2xl animate-pulse delay-700" />
-                
-                {/* CSS Grid graphic */}
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                  <div className="h-12 border-b border-slate-100 bg-slate-50/50 flex items-center px-4 gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-amber-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
-                  </div>
-                  <div className="p-8 grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
-                    <div className="bg-slate-100 rounded-lg h-full" />
-                    <div className="flex flex-col gap-4">
-                      <div className="bg-blue-50 rounded-lg h-1/2 flex items-center justify-center border border-blue-100">
-                         <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-500 to-emerald-400 opacity-80" />
+          {/* Right Column: Visual */}
+          <div className="relative w-full">
+            {hero.image ? (
+              <div className="relative w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl bg-slate-900">
+                {hero.image.media_type === "video" ? (
+                  <video
+                    src={mediaUrl(hero.image.storage_path)}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={mediaUrl(hero.image.storage_path)}
+                    alt={hero.image.alt_text || "Hero Image"}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="relative hidden lg:block h-[500px] w-full">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Abstract decorative elements */}
+                  <div className="relative w-full h-full max-w-md mx-auto">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[#0a82bd]/20 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute top-1/4 right-1/4 w-48 h-48 bg-[#00a56f]/20 rounded-full blur-2xl animate-pulse delay-700" />
+                    <div className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-yellow-400/20 rounded-full blur-2xl animate-pulse delay-500" />
+                    
+                    {/* CSS Grid graphic */}
+                    <div className="absolute inset-0 bg-white/50 backdrop-blur-sm border border-white/60 rounded-2xl shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                      <div className="h-12 border-b border-slate-100 bg-slate-50/50 flex items-center px-4 gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-400" />
+                        <div className="w-3 h-3 rounded-full bg-amber-400" />
+                        <div className="w-3 h-3 rounded-full bg-green-400" />
                       </div>
-                      <div className="bg-emerald-50 rounded-lg h-1/2 border border-emerald-100" />
+                      <div className="p-8 grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
+                        <div className="bg-slate-100 rounded-lg h-full" />
+                        <div className="flex flex-col gap-4">
+                          <div className="bg-blue-50 rounded-lg h-1/2 flex items-center justify-center border border-blue-100">
+                             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#0a82bd] via-[#00a56f] to-yellow-400 opacity-80" />
+                          </div>
+                          <div className="bg-green-50 rounded-lg h-1/2 border border-green-100" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           
         </div>

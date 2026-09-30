@@ -1,8 +1,8 @@
 const getApiBase = () => {
   if (typeof window === "undefined") {
-    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
   }
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 };
 
 export async function apiFetch<T>(
@@ -55,3 +55,4 @@ export async function adminFetch<T>(
 
   return res.json() as Promise<T>;
 }
+

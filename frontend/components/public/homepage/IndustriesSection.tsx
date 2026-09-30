@@ -16,7 +16,7 @@ export default function IndustriesSection({ industries }: IndustriesSectionProps
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-block py-1 px-3 rounded-full bg-slate-100 text-slate-700 text-sm font-semibold tracking-wide uppercase mb-4 shadow-sm border border-slate-200">
+          <span className="inline-block py-1 px-3 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold tracking-wide uppercase mb-4 shadow-sm border border-yellow-200">
             Industries
           </span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
@@ -29,8 +29,8 @@ export default function IndustriesSection({ industries }: IndustriesSectionProps
 
         {/* Industries Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {industries.map((industry) => (
-            <IndustryCard key={industry.id} industry={industry} />
+          {industries.map((industry, index) => (
+            <IndustryCard key={industry.id} industry={industry} index={index} />
           ))}
         </div>
 
@@ -38,7 +38,7 @@ export default function IndustriesSection({ industries }: IndustriesSectionProps
         <div className="mt-16 text-center">
           <Link
             href="/industries"
-            className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 shadow-sm"
+            className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-[#0a82bd] transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 shadow-sm"
           >
             Explore All Industries
             <ArrowRight size={18} className="ml-2" aria-hidden="true" />

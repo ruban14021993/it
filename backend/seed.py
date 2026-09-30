@@ -8,6 +8,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from sqlalchemy import select
 from app.database import AsyncSessionLocal, engine, Base
 from app.models import (
     Role, AdminUser, SiteSetting, HeroSection, AboutContent,
@@ -28,22 +29,30 @@ async def seed():
         # ----------------------------------------------------------------
         # Roles
         # ----------------------------------------------------------------
-        superadmin_role = Role(name="superadmin", permissions={"all": True})
-        editor_role = Role(name="editor", permissions={"content": True})
-        db.add(superadmin_role)
-        db.add(editor_role)
+        superadmin_role = (await db.execute(select(Role).filter_by(name="superadmin"))).scalars().first()
+        if not superadmin_role:
+            superadmin_role = Role(name="superadmin", permissions={"all": True})
+            db.add(superadmin_role)
+            await db.flush()
+        editor_role = (await db.execute(select(Role).filter_by(name="editor"))).scalars().first()
+        if not editor_role:
+            editor_role = Role(name="editor", permissions={"content": True})
+            db.add(editor_role)
+            await db.flush()
         await db.flush()
 
         # ----------------------------------------------------------------
         # Admin user
         # ----------------------------------------------------------------
-        admin = AdminUser(
-            name=settings.ADMIN_NAME,
-            email=settings.ADMIN_EMAIL,
-            hashed_password=hash_password(settings.ADMIN_PASSWORD),
-            role_id=superadmin_role.id,
-        )
-        db.add(admin)
+        admin = (await db.execute(select(AdminUser).filter_by(email=settings.ADMIN_EMAIL))).scalars().first()
+        if not admin:
+            admin = AdminUser(
+                name=settings.ADMIN_NAME,
+                email=settings.ADMIN_EMAIL,
+                hashed_password=hash_password(settings.ADMIN_PASSWORD),
+                role_id=superadmin_role.id,
+            )
+            db.add(admin)
 
         # ----------------------------------------------------------------
         # Site settings
@@ -63,21 +72,23 @@ async def seed():
             ("careers_page_content", "Join us as we create the future and shape millions of lives globally every day! We are transforming our world and looking for others who want to make an impact."),
         ]
         for key, value in site_settings_data:
-            db.add(SiteSetting(key=key, value=value))
+            if not (await db.execute(select(SiteSetting).filter_by(key=key))).scalars().first():
+                db.add(SiteSetting(key=key, value=value))
 
         # ----------------------------------------------------------------
         # Hero section
         # ----------------------------------------------------------------
-        db.add(HeroSection(
-            eyebrow="Innovative Technology Solutions",
-            heading="Infinity Mind Tech",
-            description="Empowering AI, Cloud, and Blockchain Innovation",
-            primary_cta_text="Explore Products",
-            primary_cta_url="/products",
-            secondary_cta_text="Contact Us",
-            secondary_cta_url="/contact",
-            is_active=True,
-            display_order=1,
+        if not (await db.execute(select(HeroSection).limit(1))).scalars().first():
+            db.add(HeroSection(
+                eyebrow="Innovative Technology Solutions",
+                heading="Infinity Mind Tech",
+                description="Empowering AI, Cloud, and Blockchain Innovation",
+                primary_cta_text="Explore Products",
+                primary_cta_url="/products",
+                secondary_cta_text="Contact Us",
+                secondary_cta_url="/contact",
+                is_active=True,
+                display_order=1,
         ))
 
         # ----------------------------------------------------------------
@@ -96,55 +107,58 @@ async def seed():
              "At InfinityMind Tech Pvt Ltd, we specialize in providing innovative startup ideas and end-to-end business solutions for aspiring entrepreneurs.", 5),
         ]
         for key, title, desc, order in homepage_sections:
-            db.add(HomepageSection(
-                section_key=key, title=title, description=desc,
-                cta_text="Learn More", cta_url="#",
-                is_active=True, display_order=order,
-            ))
+            if not (await db.execute(select(HomepageSection).filter_by(section_key=key))).scalars().first():
+                db.add(HomepageSection(
+                    section_key=key, title=title, description=desc,
+                    cta_text="Learn More", cta_url="#",
+                    is_active=True, display_order=order,
+                ))
 
         # ----------------------------------------------------------------
         # About content
         # ----------------------------------------------------------------
-        db.add(AboutContent(
-            company_name="InfinityMind Tech Pvt. Ltd.",
-            tagline="Your Partner in Smart Solutions",
-            overview="InfinityMind Tech Pvt. Ltd. is a cutting-edge software development company specializing in delivering innovative and reliable technology solutions. Choosing us means partnering with a team dedicated to your success. Infinity Mind Tech is a leading designer and manufacturer of products that Sense, Connect, and Move.",
-            founder_name="R. Jeyantha Senan B.Tech, MBA",
-            founder_title="Founder and Chairman",
-            founder_message="""It Gives Me Immense Pride And Pleasure To Welcome You To InfinityMind Tech Pvt Ltd.
+        if not (await db.execute(select(AboutContent).limit(1))).scalars().first():
+            db.add(AboutContent(
+                company_name="InfinityMind Tech Pvt. Ltd.",
+                tagline="Your Partner in Smart Solutions",
+                overview="InfinityMind Tech Pvt. Ltd. is a cutting-edge software development company specializing in delivering innovative and reliable technology solutions. Choosing us means partnering with a team dedicated to your success. Infinity Mind Tech is a leading designer and manufacturer of products that Sense, Connect, and Move.",
+                founder_name="R. Jeyantha Senan B.Tech, MBA",
+                founder_title="Founder and Chairman",
+                founder_message="""It Gives Me Immense Pride And Pleasure To Welcome You To InfinityMind Tech Pvt Ltd.
 Since our inception in 2008, InfinityMind Tech has been driven by a single, powerful vision — to transform businesses through innovative software solutions. What began as a humble venture with a few passionate minds has today evolved into a dynamic technology company that continues to serve clients across industries with integrity, creativity, and excellence.
 Our journey has been shaped by a deep commitment to quality, customer satisfaction, and continuous innovation. At InfinityMind Tech, we don't just build software — we build relationships, solve real-world problems, and empower businesses to reach their full potential.
 As the Founder and Chairman, R. Jeyantha Senan B.Tech, MBA, have always believed in a future where technology simplifies lives, enhances productivity, and drives sustainable growth. Our talented teams of developers, engineers, and strategic thinkers strive to stay ahead of industry trends, delivering robust and scalable solutions tailored to our clients' evolving needs.
 Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embracing new digital paradigms, and fostering long-term value for our clients, partners, and stakeholders. We are committed to ethical growth, innovation-led development, and building a legacy that inspires the next generation of tech leaders.""",
-            founded_year=2008,
-            mission="We strive to provide innovative solutions that empower businesses to achieve their goals.",
-            vision="To be the leading provider of cutting-edge technology solutions, making a positive impact worldwide.",
-            future_vision="We help our clients navigate the rapidly changing technology landscape and position themselves for long-term success.",
-            values="Our commitment to your success doesn't end with the delivery of a solution. Our dedicated support team is available to address any issues or concerns you may have.",
-            commitment_items=[
-                {"title": "Support & Maintenance", "description": "Our commitment to your success doesn't end with the delivery of a solution."},
-                {"title": "Corporate Responsibility", "description": "InfinityMind Tech Pvt. Ltd. is committed to conducting business ethically and sustainably."},
-                {"title": "Innovation and Quality", "description": "We continuously explore and adopt the latest technologies to deliver innovative solutions."},
-                {"title": "Ethical and Sustainable Practices", "description": "We prioritize environmentally friendly practices, fair labor policies, and ethical business conduct."},
-            ],
-            why_choose_items=[
-                {"title": "Expertise and Experience", "description": "Delivering high-quality IT solutions across industries with a strong history."},
-                {"title": "Client-Centric Approach", "description": "We prioritize open communication and collaboration with our clients."},
-                {"title": "Strong Security Focus", "description": "In today's digital world, security is paramount. We implement best practices in security and compliance."},
-                {"title": "Competitive Pricing", "description": "We offer competitive pricing without compromising on quality."},
-                {"title": "Comprehensive Service Offerings", "description": "We offer a wide range of services, from initial consulting and strategy development to implementation and ongoing support."},
-            ],
+                founded_year=2008,
+                mission="We strive to provide innovative solutions that empower businesses to achieve their goals.",
+                vision="To be the leading provider of cutting-edge technology solutions, making a positive impact worldwide.",
+                future_vision="We help our clients navigate the rapidly changing technology landscape and position themselves for long-term success.",
+                values="Our commitment to your success doesn't end with the delivery of a solution. Our dedicated support team is available to address any issues or concerns you may have.",
+                commitment_items=[
+                    {"title": "Support & Maintenance", "description": "Our commitment to your success doesn't end with the delivery of a solution."},
+                    {"title": "Corporate Responsibility", "description": "InfinityMind Tech Pvt. Ltd. is committed to conducting business ethically and sustainably."},
+                    {"title": "Innovation and Quality", "description": "We continuously explore and adopt the latest technologies to deliver innovative solutions."},
+                    {"title": "Ethical and Sustainable Practices", "description": "We prioritize environmentally friendly practices, fair labor policies, and ethical business conduct."},
+                ],
+                why_choose_items=[
+                    {"title": "Expertise and Experience", "description": "Delivering high-quality IT solutions across industries with a strong history."},
+                    {"title": "Client-Centric Approach", "description": "We prioritize open communication and collaboration with our clients."},
+                    {"title": "Strong Security Focus", "description": "In today's digital world, security is paramount. We implement best practices in security and compliance."},
+                    {"title": "Competitive Pricing", "description": "We offer competitive pricing without compromising on quality."},
+                    {"title": "Comprehensive Service Offerings", "description": "We offer a wide range of services, from initial consulting and strategy development to implementation and ongoing support."},
+                ],
         ))
 
         # ----------------------------------------------------------------
         # Contact
         # ----------------------------------------------------------------
-        db.add(ContactSetting(
-            primary_email="infinitymindtech@gmail.com",
-            hr_email="hr@infinitymindtech.com",
-            primary_phone="+91 8778521963",
-            contact_form_enabled=True,
-            contact_form_recipient="infinitymindtech@gmail.com",
+        if not (await db.execute(select(ContactSetting).limit(1))).scalars().first():
+            db.add(ContactSetting(
+                primary_email="infinitymindtech@gmail.com",
+                hr_email="hr@infinitymindtech.com",
+                primary_phone="+91 8778521963",
+                contact_form_enabled=True,
+                contact_form_recipient="infinitymindtech@gmail.com",
         ))
 
         branches_data = [
@@ -154,7 +168,8 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
             ("Nagercoil", False, 4),
         ]
         for name, is_primary, order in branches_data:
-            db.add(Branch(name=name, is_primary=is_primary, display_order=order))
+            if not (await db.execute(select(Branch).filter_by(name=name))).scalars().first():
+                db.add(Branch(name=name, is_primary=is_primary, display_order=order))
 
         social_data = [
             ("facebook", "#", "Facebook", 1),
@@ -162,7 +177,8 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
             ("linkedin", "#", "Linkedin", 3),
         ]
         for platform, url, icon, order in social_data:
-            db.add(SocialLink(platform=platform, url=url, icon=icon, display_order=order))
+            if not (await db.execute(select(SocialLink).filter_by(platform=platform))).scalars().first():
+                db.add(SocialLink(platform=platform, url=url, icon=icon, display_order=order, is_active=True))
 
         # ----------------------------------------------------------------
         # Product Categories
@@ -176,8 +192,11 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
         ]
         categories = {}
         for name, slug, order in cat_data:
-            cat = ProductCategory(name=name, slug=slug, display_order=order)
-            db.add(cat)
+            cat = (await db.execute(select(ProductCategory).filter_by(slug=slug))).scalars().first()
+            if not cat:
+                cat = ProductCategory(name=name, slug=slug, display_order=order)
+                db.add(cat)
+                await db.flush()
             categories[slug] = cat
         await db.flush()
 
@@ -218,13 +237,14 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
         ]
         for name, slug, cat_slug, is_featured, order in products_data:
             cat = categories.get(cat_slug)
-            db.add(Product(
-                name=name, slug=slug,
-                category_id=cat.id if cat else None,
-                is_active=True, is_featured=is_featured,
-                display_order=order,
-                short_description=f"{name} — to be updated by admin.",
-            ))
+            if not (await db.execute(select(Product).filter_by(slug=slug))).scalars().first():
+                db.add(Product(
+                    name=name, slug=slug,
+                    category_id=cat.id if cat else None,
+                    is_active=True, is_featured=is_featured,
+                    display_order=order,
+                    short_description=f"{name} — to be updated by admin.",
+                ))
 
         # ----------------------------------------------------------------
         # Services (8 confirmed)
@@ -240,12 +260,13 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
             ("Blockchain", "blockchain", "Link", 8),
         ]
         for name, slug, icon, order in services_data:
-            db.add(Service(
-                name=name, slug=slug, icon=icon,
-                is_active=True, is_featured=(order <= 6),
-                display_order=order,
-                short_description=f"{name} — to be updated by admin.",
-            ))
+            if not (await db.execute(select(Service).filter_by(slug=slug))).scalars().first():
+                db.add(Service(
+                    name=name, slug=slug, icon=icon,
+                    is_active=True, is_featured=(order <= 6),
+                    display_order=order,
+                    short_description=f"{name} — to be updated by admin.",
+                ))
 
         # ----------------------------------------------------------------
         # Industries (12 confirmed)
@@ -265,11 +286,12 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
             ("Logistics", "logistics", 12),
         ]
         for name, slug, order in industries_data:
-            db.add(Industry(
-                name=name, slug=slug,
-                is_active=True, display_order=order,
-                short_description=f"{name} — to be updated by admin.",
-            ))
+            if not (await db.execute(select(Industry).filter_by(slug=slug))).scalars().first():
+                db.add(Industry(
+                    name=name, slug=slug,
+                    is_active=True, display_order=order,
+                    short_description=f"{name} — to be updated by admin.",
+                ))
 
         # ----------------------------------------------------------------
         # Training Programs (6 confirmed)
@@ -283,14 +305,15 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
             ("Android & iOS App Development", "android-ios-app-development", "Build mobile apps using Kotlin, Java (Android) and Swift (iOS). Includes UI/UX.", 6),
         ]
         for name, slug, desc, order in training_data:
-            db.add(TrainingProgram(
-                name=name, slug=slug,
-                short_description=desc,
-                is_active=True, display_order=order,
-                who_can_apply=["Final Year Students", "Recent Graduates", "Anyone Passionate About Learning – No Experience Needed!"],
-                what_you_gain=["Industry-Relevant Skillset", "Internship Certificate", "Live Project Experience", "Mentorship From Industry Experts", "Placement Assistance"],
-                cta_text="Know More", cta_url="/contact",
-            ))
+            if not (await db.execute(select(TrainingProgram).filter_by(slug=slug))).scalars().first():
+                db.add(TrainingProgram(
+                    name=name, slug=slug,
+                    short_description=desc,
+                    is_active=True, display_order=order,
+                    who_can_apply=["Final Year Students", "Recent Graduates", "Anyone Passionate About Learning – No Experience Needed!"],
+                    what_you_gain=["Industry-Relevant Skillset", "Internship Certificate", "Live Project Experience", "Mentorship From Industry Experts", "Placement Assistance"],
+                    cta_text="Know More", cta_url="/contact",
+                ))
 
         # ----------------------------------------------------------------
         # Navigation (primary)
@@ -307,14 +330,18 @@ Looking ahead, We Remain Focused On Expanding Our Technological Horizons, embrac
         ]
         nav_map = {}
         for label, url, location, parent_label, order in nav_items:
-            item = NavigationItem(label=label, url=url, location=location, display_order=order)
-            db.add(item)
+            item = (await db.execute(select(NavigationItem).filter_by(label=label, location=location))).scalars().first()
+            if not item:
+                item = NavigationItem(label=label, url=url, location=location, display_order=order)
+                db.add(item)
+                await db.flush()
             nav_map[label] = item
         await db.flush()
 
         # Sub-items for "Who We Are"
         who_parent = nav_map["Who We Are"]
-        db.add(NavigationItem(label="About Us", url="/about", location="primary", parent_id=who_parent.id, display_order=1))
+        if not (await db.execute(select(NavigationItem).filter_by(label="About Us", location="primary"))).scalars().first():
+            db.add(NavigationItem(label="About Us", url="/about", location="primary", parent_id=who_parent.id if who_parent else None, display_order=1))
 
         await db.commit()
         print("✅ Seed completed successfully!")

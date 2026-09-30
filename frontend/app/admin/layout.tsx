@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "@/app/globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import { AuthProvider } from "@/lib/admin/auth-context";
 
 export const metadata: Metadata = {
   title: {
-    default: "Admin — InfinityMind Tech",
+    default: "Admin - InfinityMind Tech",
     template: "%s | Admin",
   },
 };
@@ -17,10 +14,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-gray-100`}>
-        {children}
-      </body>
-    </html>
+    <div className="admin-root bg-slate-50 min-h-screen">
+      <AuthProvider>{children}</AuthProvider>
+    </div>
   );
 }

@@ -14,7 +14,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export function mediaUrl(path: string | null | undefined): string {
   if (!path) return "/placeholder.jpg";
   if (path.startsWith("http")) return path;
-  return `${API_BASE}${path}`;
+  return path;
 }
 
 /**

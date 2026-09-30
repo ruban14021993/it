@@ -1,4 +1,5 @@
-from pydantic_settings import BaseSettings
+﻿from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import Optional
 
 
@@ -12,6 +13,15 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://infinity_user:infinity_pass@localhost:5432/infinitydb"
     DATABASE_ECHO: bool = False
+
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def normalize_database_url(cls, v: str) -> str:
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        if v.startswith("postgresql://"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # JWT
     SECRET_KEY: str = "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY_IN_PRODUCTION"

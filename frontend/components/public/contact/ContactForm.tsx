@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
+import { submitEnquiry } from "@/lib/api/public";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -11,7 +12,8 @@ export default function ContactForm() {
     message: ""
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -29,16 +31,20 @@ export default function ContactForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setStatus("submitting");
 
-    // Simulate frontend-only submission behavior
-    setTimeout(() => {
+    try {
+      const res = await submitEnquiry(formData);
+      setSuccessMessage(res.message || "Your enquiry has been submitted successfully.");
       setStatus("success");
-    }, 1000);
+    } catch (e) {
+      console.error(e);
+      setStatus("error");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,12 +52,14 @@ export default function ContactForm() {
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Clear specific error when user starts typing again
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
         [e.target.name]: ""
       });
+    }
+    if (status === "error") {
+      setStatus("idle");
     }
   };
 
@@ -61,9 +69,9 @@ export default function ContactForm() {
         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-6">
           <CheckCircle2 size={32} className="text-emerald-500" aria-hidden="true" />
         </div>
-        <h3 className="text-2xl font-bold text-slate-900 mb-3">Validation Successful</h3>
+        <h3 className="text-2xl font-bold text-slate-900 mb-3">Message Sent</h3>
         <p className="text-slate-600 mb-8 max-w-sm mx-auto">
-          This is a frontend-only demonstration. Form submission will be connected to the backend API in a future phase. No data has been submitted.
+          {successMessage}
         </p>
         <button
           onClick={() => {
@@ -82,6 +90,13 @@ export default function ContactForm() {
     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 md:p-10">
       <h3 className="text-2xl font-bold text-slate-900 mb-6">Send Us a Message</h3>
       
+      {status === "error" && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3">
+          <AlertCircle size={18} className="mt-0.5 shrink-0" />
+          <p>Unable to submit your enquiry right now. Please try again.</p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -169,7 +184,7 @@ export default function ContactForm() {
           disabled={status === "submitting"}
           className="w-full flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg"
         >
-          {status === "submitting" ? "Validating..." : "Send Message"}
+          {status === "submitting" ? "Sending..." : "Send Message"}
           {status !== "submitting" && <Send size={18} className="ml-2" aria-hidden="true" />}
         </button>
       </form>

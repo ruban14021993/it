@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { Menu, X, ChevronDown, Box, LayoutGrid } from "lucide-react";
 import type { NavItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -14,16 +15,12 @@ export default function SiteHeader({ navItems }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100 shadow-sm h-16">
-      <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between h-full">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100 shadow-sm flex flex-col">
+      <div className="h-1.5 w-full bg-gradient-to-r from-[#0a82bd] via-[#00a56f] via-yellow-400 to-orange-500 shadow-[0_0_10px_rgba(10,130,189,0.3)]"></div>
+      <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between h-20">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0 group focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center text-white shadow-sm group-hover:shadow transition-all">
-            <Sparkles size={16} />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
-            InfinityMind Tech
-          </span>
+        <Link href="/" className="flex items-center shrink-0 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md">
+          <Image src="/images/logo.jpg" alt="InfinityMind Tech" width={240} height={64} className="h-12 lg:h-14 w-auto object-contain" priority />
         </Link>
 
         {/* Desktop nav */}
@@ -38,8 +35,8 @@ export default function SiteHeader({ navItems }: SiteHeaderProps) {
                 target={item.target}
                 className={cn(
                   "px-4 py-2 text-sm font-medium text-gray-700 rounded-md transition-all",
-                  "hover:text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:text-blue-700 focus:bg-blue-50",
-                  item.label === "Contact" ? "ml-4 bg-blue-600 text-white hover:bg-blue-700 hover:text-white" : ""
+                  "hover:text-[#0a82bd] hover:bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-[#0a82bd] focus:text-[#0a82bd]",
+                  item.label === "Contact" ? "ml-4 bg-gradient-to-r from-[#0a82bd] to-[#00a56f] text-white hover:from-[#086a9a] hover:to-[#008257] hover:text-white shadow-md shadow-blue-500/20 border-0" : ""
                 )}
               >
                 {item.label}
@@ -64,7 +61,7 @@ export default function SiteHeader({ navItems }: SiteHeaderProps) {
       {mobileOpen && (
         <div
           id="mobile-menu"
-          className="lg:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-100 shadow-lg px-4 py-4 max-h-[calc(100vh-4rem)] overflow-y-auto"
+          className="lg:hidden absolute top-[5.375rem] left-0 right-0 bg-white border-b border-gray-100 shadow-lg px-4 py-4 max-h-[calc(100vh-5.375rem)] overflow-y-auto"
         >
           <nav className="flex flex-col space-y-1" aria-label="Mobile Navigation">
             {navItems.map((item) => (
@@ -128,7 +125,7 @@ function DropdownItem({ item }: { item: NavItem }) {
       }}
     >
       <button 
-        className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 group-hover:text-blue-700 group-hover:bg-blue-50 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 focus:text-blue-700 focus:bg-blue-50"
+        className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 group-hover:text-[#0a82bd] group-hover:bg-blue-50/50 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-[#0a82bd] focus:text-[#0a82bd]"
         aria-expanded={open}
         aria-haspopup="true"
         onKeyDown={handleKeyDown}
@@ -142,18 +139,35 @@ function DropdownItem({ item }: { item: NavItem }) {
       </button>
       
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-          {item.children.map((child) => (
-            <Link
-              key={child.id}
-              href={child.url}
-              className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600"
-            >
-              {child.label}
-            </Link>
-          ))}
+        <div className={cn(
+          "absolute top-full pt-2 z-50",
+          item.children.length > 5 
+            ? "right-0 lg:-right-10 w-[90vw] max-w-[960px]" 
+            : "left-0 w-56"
+        )}>
+          <div className={cn(
+            "bg-white rounded-xl shadow-xl border border-gray-100 p-4 animate-in fade-in slide-in-from-top-2",
+            item.children.length > 5 
+              ? "max-h-[75vh] overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-2" 
+              : "flex flex-col space-y-1"
+          )}>
+            {item.children.map((child, idx) => (
+              <Link
+                key={child.id}
+                href={child.url}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#0a82bd] hover:bg-blue-50/50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#0a82bd] group/item"
+              >
+                <div className="flex-shrink-0 w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center text-slate-500 group-hover/item:bg-gradient-to-br group-hover/item:from-[#0a82bd] group-hover/item:to-[#00a56f] group-hover/item:text-white transition-all shadow-sm">
+                  {idx % 2 === 0 ? <Box size={16} /> : <LayoutGrid size={16} />}
+                </div>
+                <span className="leading-snug">{child.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+
