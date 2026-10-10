@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/admin/auth-context";
 
 export const metadata: Metadata = {
   title: {
-    default: "Admin - InfinityMind Tech",
+    default: "Admin - InfinityMind Tech | InfinityMind",
     template: "%s | Admin",
   },
 };
