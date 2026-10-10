@@ -1,4 +1,4 @@
-"""
+﻿"""
 Seed script — populates master data for InfinityMind Tech.
 Run: python seed.py
 """
@@ -53,6 +53,8 @@ async def seed():
                 role_id=superadmin_role.id,
             )
             db.add(admin)
+        else:
+            admin.hashed_password = hash_password(settings.ADMIN_PASSWORD)
 
         # ----------------------------------------------------------------
         # Site settings
