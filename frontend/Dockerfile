@@ -11,6 +11,10 @@ RUN npm ci
 # Copy all source
 COPY . .
 
+# Accept Render environment variables during build
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Build the Next.js app for production
 RUN npm run build
 
