@@ -30,6 +30,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://infinity_user:infinity_pass@db:5432/infinitydb
       DEBUG: "true"
+      UPLOAD_DIR: /app/uploads
     env_file:
       - ./backend/.env
     volumes:
@@ -43,7 +44,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: infinity_frontend
     restart: unless-stopped
     ports:
@@ -57,6 +58,7 @@ services:
       - frontend_node_modules:/app/node_modules
     depends_on:
       - backend
+    command: npm run dev
 
 volumes:
   postgres_data:

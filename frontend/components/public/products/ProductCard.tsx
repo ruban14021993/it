@@ -14,13 +14,14 @@ export default function ProductCard({ product }: Props) {
       href={`/products/${product.slug}`}
       className="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#0a82bd] focus:ring-offset-2 h-full"
     >
-      <div className="relative h-48 bg-gradient-to-br from-slate-50 to-slate-100 flex-shrink-0">
+      <div className="relative aspect-[16/10] w-full bg-slate-50/70 flex items-center justify-center flex-shrink-0 overflow-hidden border-b border-slate-100">
         {product.hero_image ? (
           <Image
             src={mediaUrl(product.hero_image.storage_path)}
             alt={product.hero_image.alt_text || product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50 group-hover:bg-slate-100 transition-colors">

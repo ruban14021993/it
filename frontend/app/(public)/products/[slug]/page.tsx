@@ -117,7 +117,7 @@ export default async function ProductDetailPage({ params }: Props) {
                       alt={product.name}
                       width={900}
                       height={600}
-                      className="w-full h-auto object-cover aspect-[4/3] mix-blend-luminosity hover:mix-blend-normal transition-all duration-700"
+                      className="w-full h-auto object-contain aspect-[4/3] p-2 hover:scale-[1.02] transition-all duration-700"
                     />
                   ) : (
                     <div className="w-full aspect-[4/3] flex flex-col items-center justify-center text-slate-500 p-12 text-center bg-slate-900/50">

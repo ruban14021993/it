@@ -165,7 +165,7 @@ class NavigationItem(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    children: Mapped[list["NavigationItem"]] = relationship("NavigationItem", back_populates="parent", foreign_keys=[parent_id])
+    children: Mapped[list["NavigationItem"]] = relationship("NavigationItem", back_populates="parent", foreign_keys=[parent_id], lazy="selectin")
     parent: Mapped["NavigationItem | None"] = relationship("NavigationItem", back_populates="children", remote_side=[id], foreign_keys=[parent_id])
 
 

@@ -26,7 +26,9 @@ async def get_navigation(db: AsyncSession = Depends(get_db)):
             NavigationItem.location == "primary",
             NavigationItem.parent_id.is_(None),
         )
-        .options(selectinload(NavigationItem.children))
+        .options(
+            selectinload(NavigationItem.children).selectinload(NavigationItem.children)
+        )
         .order_by(NavigationItem.display_order)
     )
     return result.scalars().all()
@@ -42,6 +44,9 @@ async def get_footer(db: AsyncSession = Depends(get_db)):
         result = await db.execute(
             select(NavigationItem)
             .where(NavigationItem.is_active == True, NavigationItem.location == loc)
+            .options(
+                selectinload(NavigationItem.children).selectinload(NavigationItem.children)
+            )
             .order_by(NavigationItem.display_order)
         )
         items = result.scalars().all()

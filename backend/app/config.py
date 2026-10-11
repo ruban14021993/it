@@ -1,4 +1,4 @@
-﻿from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings
 from pydantic import field_validator
 from typing import Optional
 
@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     # Media / Uploads
     UPLOAD_DIR: str = "../uploads"
     MAX_UPLOAD_SIZE_MB: int = 10
+
+    @field_validator("UPLOAD_DIR", mode="before")
+    @classmethod
+    def resolve_upload_dir(cls, v: str) -> str:
+        import os
+        if os.path.exists("/app/uploads"):
+            return "/app/uploads"
+        return v
     ALLOWED_IMAGE_TYPES: list[str] = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"]
     ALLOWED_VIDEO_TYPES: list[str] = ["video/mp4", "video/webm"]
 

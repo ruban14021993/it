@@ -18,7 +18,9 @@ async def list_nav(
     result = await db.execute(
         select(NavigationItem)
         .where(NavigationItem.parent_id.is_(None))
-        .options(selectinload(NavigationItem.children))
+        .options(
+            selectinload(NavigationItem.children).selectinload(NavigationItem.children)
+        )
         .order_by(NavigationItem.display_order)
     )
     return result.scalars().all()
